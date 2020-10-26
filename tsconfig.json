@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "target": "esnext",
+    "moduleResolution": "node",
+    "declarationDir": "./dist",
+    "noImplicitAny": true,
+    "outDir": "./dist",
+    "lib": [
+        "es2015",
+        "es2016",
+        "es2017",
+        "dom"
+        ],
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+      "node_modules"
+      ]
+}

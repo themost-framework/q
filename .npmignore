@@ -1,0 +1,9 @@
+# project
+node_modules
+.gitignore
+rollup.config.js
+tsconfig.json
+
+# test
+tsconfig.spec.json
+spec
