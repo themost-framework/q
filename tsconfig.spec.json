@@ -4,6 +4,7 @@
     "target": "esnext",
     "module": "commonjs",
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "declarationDir": "./dist",
     "noImplicitAny": true,
     "outDir": "./dist",

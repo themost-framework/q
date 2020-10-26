@@ -369,13 +369,12 @@ class QueryExpression {
     /**
      * Prepares a select statement expression
      */
-    select() {
+    select(...args: any[]) {
         // cleanup
         delete this.$delete;
         delete this.$insert;
         delete this.$update;
         // get argument
-        let args = Array.prototype.slice.call(arguments);
         if (args.length === 0) {
             this.$select = { };
             return this;
@@ -405,7 +404,7 @@ class QueryExpression {
      * @param {*} collection
      * @returns {QueryExpression}
      */
-    from(collection: string): this {
+    from(collection: any): this {
         // Args.check(this.$select != null, new Error('Items to select must be defined. Use select() method first.'));
         Args.check( Array.isArray(collection) === false, new Error('Target collection cannot be an array.'));
         // clear collection
@@ -521,9 +520,8 @@ class QueryExpression {
      * Applies an ascending ordering to a query expression
      * @returns {QueryExpression}
      */
-    orderBy(): this  {
+    orderBy(...args: any[]): this  {
         // get arguments
-        let args = Array.prototype.slice.call(arguments);
         if (args.length === 0) {
             return this;
         }
@@ -556,9 +554,7 @@ class QueryExpression {
      * Applies a descending ordering to a query expression
      * @returns {QueryExpression}
      */
-    orderByDescending(): this  {
-        // get arguments
-        let args = Array.prototype.slice.call(arguments);
+    orderByDescending(...args: any[]): this  {
         if (args.length === 0) {
             return this;
         }
@@ -590,10 +586,9 @@ class QueryExpression {
      * Performs a subsequent ordering in a query expression
      * @returns {QueryExpression}
      */
-    thenBy(): this  {
+    thenBy(...args: any[]): this  {
         Args.notNull(this.$order, 'Order expression is empty. Use orderBy() or orderByDescending() method first.');
         // get arguments
-        let args = Array.prototype.slice.call(arguments);
         if (args.length === 0) {
             return this;
         }
@@ -626,10 +621,9 @@ class QueryExpression {
      * Performs a subsequent ordering in a query expression
      * @returns {QueryExpression}
      */
-    thenByDescending(): this  {
+    thenByDescending(...args: any[]): this  {
         Args.notNull(this.$order, 'Order expression is empty. Use orderBy() or orderByDescending() method first.');
         // get arguments
-        let args = Array.prototype.slice.call(arguments);
         if (args.length === 0) {
             return this;
         }
@@ -665,9 +659,8 @@ class QueryExpression {
      * @returns {QueryExpression}
      */
     /* eslint-disable-next-line no-unused-vars */
-    groupBy(): this  {
+    groupBy(...args: any[]): this  {
         // get arguments
-        let args = Array.prototype.slice.call(arguments);
         if (args.length === 0) {
             return this;
         }
@@ -1193,9 +1186,8 @@ class QueryExpression {
     /**
      * @returns {QueryExpression}
      */
-    concat(): this  {
+    concat(...args: any[]): this  {
         Args.check(this.privates.left instanceof QueryField, new InvalidLeftOperandError());
-        const args = Array.from(arguments);
         this.privates.left.concat.apply(this.privates.left, args);
         return this;
     }

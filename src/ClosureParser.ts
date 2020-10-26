@@ -43,8 +43,8 @@ const ExpressionTypes = {
  * @param {...*} args
  * @returns {number}
  */
-function count(): number {
-    return arguments.length;
+function count(...args: any[]): number {
+    return args.length;
 }
 
 // // extend StaticMethodParser
