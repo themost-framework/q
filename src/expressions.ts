@@ -3,10 +3,10 @@ import { PropertyIndexer } from "./query";
 
 class ArithmeticExpression {
     
-    static readonly OperatorRegEx = /^(\$add|\$subtract|\$multiply|\$divide|\$mod|\$bit)$/g;
+    static readonly ArithmeticOperators = [ "$add", "$subtract", "$multiply", "$divide", "$mod", "$bit" ];
 
     static isArithmeticOperator(operator: string): boolean {
-        return ArithmeticExpression.OperatorRegEx.test(operator);
+        return ArithmeticExpression.ArithmeticOperators.indexOf(operator) >= 0;
     }
 
     public left: any;
@@ -24,7 +24,7 @@ class ArithmeticExpression {
         }
         if (this.operator == null)
             throw new Error('Expected arithmetic operator.');
-        if (this.operator.match(ArithmeticExpression.OperatorRegEx) == null) {
+        if (!ArithmeticExpression.isArithmeticOperator(this.operator)) {
             throw new Error('Invalid arithmetic operator.');
         }
         //build right operand e.g. { $add:[ 5 ] }
@@ -56,10 +56,10 @@ class MemberExpression {
 
 class LogicalExpression {
 
-    static readonly OperatorRegEx = /^(\$and|\$or|\$not|\$nor)$/g;
-
+    static readonly LogicalOperators = [ "$and", "$or", "$not", "$nor" ];
+    
     static isLogicalOperator(operator: string): boolean {
-        return LogicalExpression.OperatorRegEx.test(operator);
+        return LogicalExpression.LogicalOperators.indexOf(operator) >= 0;
     }
 
     public operator: string;
@@ -70,7 +70,7 @@ class LogicalExpression {
     }
 
     exprOf() {
-        if (this.operator.match(LogicalExpression.OperatorRegEx)===null)
+        if (LogicalExpression.isLogicalOperator(this.operator) === false)
             throw new Error('Invalid logical operator.');
         if (Array.isArray(this.args) === false)
             throw new Error('Logical expression arguments cannot be null at this context.');
@@ -113,10 +113,10 @@ class LiteralExpression {
 
 class ComparisonExpression {
 
-    static readonly OperatorRegEx = /^(\$eq|\$ne|\$lte|\$lt|\$gte|\$gt|\$in|\$nin)$/g;
+    static readonly ComparisonOperators = [ "$eq", "$ne", "$lte", "$lt", "$gte", "$gt", "$in", "$nin" ];
 
     static isComparisonOperator(operator: string): boolean {
-        return ComparisonExpression.OperatorRegEx.test(operator);
+        return ComparisonExpression.ComparisonOperators.indexOf(operator) >= 0;
     }
 
     public left: any;

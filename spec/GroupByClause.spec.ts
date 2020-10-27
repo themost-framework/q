@@ -36,9 +36,10 @@ describe('Aggregate Functions', () => {
         })
         .from(Orders)
         .join(Shippers)
-        .with( (x: { Shipper: any; }) => {
-            return x.Shipper;
-        }, (y: { ShipperID: any; }) => y.ShipperID)
+        .with(
+            (x: any) => x.Shipper,
+            (y: any) => y.ShipperID
+         )
         // eslint-disable-next-line no-unused-vars
         .groupBy ( (x: any) => {
             (<any>Shippers).ShipperName
