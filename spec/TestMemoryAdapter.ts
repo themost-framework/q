@@ -537,7 +537,7 @@ class MemoryAdapter {
                 if (err) { callback.call(self,err); return; }
                 if (result.length===0) {
                     //get max value by querying the given entity
-                    const q = new QueryExpression().from(entity).select([new QueryField(attribute).max()]);
+                    const q = new QueryExpression().from(entity).select(new QueryField(attribute).max());
                     self.execute(q,null, function(err?: Error, result?: any) {
                         if (err) { callback.call(self, err); return; }
                         let value = 1;

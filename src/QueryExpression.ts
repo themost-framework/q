@@ -26,7 +26,7 @@ class QueryExpression {
     static readonly EvaluationOperators = { $mod:'$mod', $add:'$add', $sub:'$sub', $mul:'$mul', $div:'$div' };
 
     public $collection: any;
-    private privates: any;
+    private privates: any = {};
     $match: any;
     $prepared: any;
     $select: any;
@@ -44,33 +44,16 @@ class QueryExpression {
     $skip: number;
 
     constructor() {
-        /**
-         * @private
-         */
-        Object.defineProperty(this, 'privates', {
-            enumerable: false,
-            configurable: false,
-            writable: false,
-            value: {}
-        });
+        //
     }
     /**
      * Clones the current expression and returns a new QueryExpression object.
-     * @example
-     * var q = new QueryExpression();
-     * //do some stuff
-     * //...
-     * //clone expression
-     * var q1 = q.clone();
-     * @returns {QueryExpression}
      */
     clone(): this {
         return cloneDeep(this);
     }
     /**
      * Sets the alias of active expression (collection or field)
-     * @param {string} alias
-     * @returns {QueryExpression}
      */
     as(alias: string): this {
         Args.notNull(alias, 'Alias');
@@ -182,6 +165,9 @@ class QueryExpression {
         }
         return this;
     }
+    where<T>(expr: (value: T) => boolean, params?: any): this;
+    where<T,J>(expr: (value1: T, value2: J) => any, params?: any): this;
+    where(expr: any, params?: any): this;
     /**
      * Starts a comparison expression by assigning left operand
      * @param {*} expr
@@ -230,7 +216,7 @@ class QueryExpression {
                         writable: true
                     });
         this.$delete = { };
-        //delete other properties (if any)
+        // delete other properties (if any)
         delete this.$insert;
         delete this.$select;
         delete this.$addFields;
@@ -242,30 +228,30 @@ class QueryExpression {
     }
     /**
      * Initializes an insert query and sets the object that is going to be inserted.
-     * @param {*} any
+     * @param {*} anyObject
      * @returns {QueryExpression}
      */
-    insert(any: any): this  {
-        if (Array.isArray(any)) {
-            return this.insertMany(any);
+    insert(anyObject: any): this  {
+        if (Array.isArray(anyObject)) {
+            return this.insertMany(anyObject);
         }
-        return this.insertOne(any);
+        return this.insertOne(anyObject);
     }
 
     /**
      * Prepares an insert query and sets the object that is going to be inserted.
-     * @param {*} any
+     * @param {*} anyObject
      * @returns {QueryExpression}
      */
-    insertOne(any: any): any {
-        Args.notNull(any, 'Item for insert');
+    insertOne(anyObject: any): any {
+        Args.notNull(anyObject, 'Item for insert');
         // check that argument is not an array
-        Args.check(Array.isArray(any) === false, new Error('Item for insert cannot be an array. Use insertMany() instead.'));
+        Args.check(Array.isArray(anyObject) === false, new Error('Item for insert cannot be an array. Use insertMany() instead.'));
         // check that argument is not an array
-        Args.check( any === Object(any), new Error('Item for insert must be an object.'));
+        Args.check( anyObject === Object(anyObject), new Error('Item for insert must be an object.'));
         // set object
-        this.$insert = any;
-        //clear object
+        this.$insert = anyObject;
+        // clear object
         delete this.$delete;
         delete this.$select;
         delete this.$addFields;
@@ -282,16 +268,16 @@ class QueryExpression {
 
     /**
      * Prepares an insert query and sets an array of objects that are going to be inserted.
-     * @param {*} any
+     * @param {*} anyObject
      * @returns {QueryExpression}
      */
-    insertMany(any: Array<any>): this {
-        Args.notNull(any, 'Items for insert');
+    insertMany(anyObject: any[]): this {
+        Args.notNull(anyObject, 'Items for insert');
         // check that argument is not an array
-        Args.check(Array.isArray(any), new Error('Items for insert must be an array'));
+        Args.check(Array.isArray(anyObject), new Error('Items for insert must be an array'));
         // set object
-        this.$insert = any;
-        //clear objects
+        this.$insert = anyObject;
+        // clear objects
         delete this.$delete;
         delete this.$select;
         delete this.$addFields;
@@ -336,7 +322,7 @@ class QueryExpression {
                         enumerable: true,
                         writable: true
                     });
-        //cleanup
+        // cleanup
         delete this.$delete;
         delete this.$select;
         if (this.privates) {
@@ -350,26 +336,29 @@ class QueryExpression {
     }
     /**
      * Sets the object that is going to be updated through an update expression.
-     * @param {*} any
+     * @param {*} anyObject
      * @returns {QueryExpression}
      */
-    set(any: any): this {
+    set(anyObject: any): this {
         // check collection
         Args.check(this.$collection != null, new Error('Target collection must be defined. Use update() method first.'));
         // check argument
-        Args.notNull(any, 'Item for update');
+        Args.notNull(anyObject, 'Item for update');
         // check that argument is not an array
-        Args.check(Array.isArray(any) === false, new Error('Item for update cannot be an array.'));
+        Args.check(Array.isArray(anyObject) === false, new Error('Item for update cannot be an array.'));
         // check that argument is not an array
-        Args.check( any === Object(any), new Error('Item for update must be an object.'));
+        Args.check( anyObject === Object(anyObject), new Error('Item for update must be an object.'));
         // set object
-        this.$update = any;
+        this.$update = anyObject;
         return this;
     }
+    select<T>(expr: (value: T) => any, params?: any): this;
+    select<T,J>(expr: (value1: T, value2: J) => any, params?: any): this;
+    select(...args: any[]): this;
     /**
      * Prepares a select statement expression
      */
-    select(...args: any[]) {
+    select(...args: any[]): this {
         // cleanup
         delete this.$delete;
         delete this.$insert;
@@ -422,14 +411,14 @@ class QueryExpression {
             // assign collection
             Object.assign(this.$collection, collection);
         }
-        //clear object
+        // clear object
         if (this.privates) {
             delete this.privates.lookup;
         }
         delete this.$delete;
         delete this.$insert;
         delete this.$update;
-        //and return
+        // and return
         return this;
     }
     /**
@@ -463,9 +452,9 @@ class QueryExpression {
                 this.$expand.push({
                     $lookup: this.privates.lookup
                 });
-                //destroy temp object
+                // destroy temp object
                 delete this.privates.lookup;
-                //and return QueryExpression
+                // and return QueryExpression
                 return this;
             }
             // try to convert collection to QueryCollection instance
@@ -482,6 +471,8 @@ class QueryExpression {
         }
         return this;
     }
+    with<T,J>(localField: (value: T) => any, foreignField: (value: T) => any): this;
+    with(localField: any, foreignField: any): this;
     /**
      * Sets a join equality expression by defining a local and a foreign field
      * @param {*} localField - The field from current collection
@@ -510,11 +501,13 @@ class QueryExpression {
         this.$expand.push({
             $lookup: this.privates.lookup
         });
-        //destroy temp object
+        // destroy temp object
         delete this.privates.lookup;
-        //and return QueryExpression
+        // and return QueryExpression
         return this;
     }
+    orderBy<T>(expr: (value: T) => any, params?: any): this;
+    orderBy(...args: any[]): this;
     // noinspection JSUnusedGlobalSymbols
     /**
      * Applies an ascending ordering to a query expression
@@ -549,6 +542,8 @@ class QueryExpression {
         });
         return this;
     }
+    orderByDescending<T>(expr: (value: T) => any, params?: any): this;
+    orderByDescending(...args: any[]): this;
     // noinspection JSUnusedGlobalSymbols
     /**
      * Applies a descending ordering to a query expression
@@ -582,6 +577,8 @@ class QueryExpression {
         });
         return this;
     }
+    thenBy<T>(expr: (value: T) => any, params?: any): this;
+    thenBy(...args: any[]): this;
     /**
      * Performs a subsequent ordering in a query expression
      * @returns {QueryExpression}
@@ -617,6 +614,8 @@ class QueryExpression {
         Object.assign(this.$order, addOrder);
         return this;
     }
+    thenByDescending<T>(expr: (value: T) => any, params?: any): this;
+    thenByDescending(...args: any[]): this;
     /**
      * Performs a subsequent ordering in a query expression
      * @returns {QueryExpression}
@@ -652,6 +651,8 @@ class QueryExpression {
         Object.assign(this.$order, addOrder);
         return this;
     }
+    groupBy<T>(expr: (value: T) => any, params?: any): this;
+    groupBy(...args: any[]): this;
     // noinspection JSUnusedGlobalSymbols
     /**
      *
@@ -719,10 +720,10 @@ class QueryExpression {
      * @returns QueryExpression
      */
     private _append(right: any): this {
-        let filter: PropertyIndexer = { };
+        const filter: PropertyIndexer = { };
         Args.notNull(right, 'Right operand');
         // get left operand
-        let left = this.privates.left;
+        const left = this.privates.left;
         // validate left operand
         Args.notNull(left, 'Left operand');
         // get left operand (query field) name e.g. "name" or $concat etc
@@ -751,13 +752,13 @@ class QueryExpression {
                     });
             }
             // set filter expression
-            (<PropertyIndexer>filter)[alias] = right;
+            (filter as PropertyIndexer)[alias] = right;
 
         } else  {
             // check if left operand is a single field expression (e.g { "dateCreated": 1 })
             if (left[name] === 1 || left[name] === 0) {
             // format expression e.g. { "price": { $eq: 500 } }
-                (<PropertyIndexer>filter)[name] = right;
+                (filter as PropertyIndexer)[name] = right;
             }
             else {
                 // [name] is an alias (e.g. { "createdAt" : "$dateCreated" } )
@@ -779,7 +780,7 @@ class QueryExpression {
         else {
             // get in-process logical operator
             const logicalOperator = this.privates.logicalOperator || '$and';
-            //get where expression current operator
+            // get where expression current operator
             const currentOperator = getOwnPropertyName(this.$match);
             if (currentOperator === logicalOperator) {
                 // push filter expression
@@ -812,9 +813,9 @@ class QueryExpression {
             return field;
         }
         // get field property
-        let name = getOwnPropertyName(field);
+        const name = getOwnPropertyName(field);
         // get field expression
-        let addField = Object.assign({ }, field);
+        const addField = Object.assign({ }, field);
         // field expression is a method reference { "$year": "dateCreated" }
         if (isMethodOrNameReference(name)) {
             // search if expression graph already exists
@@ -868,7 +869,7 @@ class QueryExpression {
         else {
             // set in-process logical operator
             const logicalOperator ='$and';
-            //get where expression current operator
+            // get where expression current operator
             const currentOperator = getOwnPropertyName(this.$match);
             if (currentOperator === logicalOperator) {
                 // push filter expression
@@ -946,7 +947,7 @@ class QueryExpression {
      * @param {Array} values - An array of values that represents the right part of the prepared expression
      * @returns {QueryExpression}
      */
-    in(values: Array<any>): this {
+    in(values: any[]): this {
         return this._append({ $in: values });
     }
     /**
@@ -954,7 +955,7 @@ class QueryExpression {
      * @param {Array} values - An array of values that represents the right part of the prepared expression
      * @returns {QueryExpression}
      */
-    notIn(values: Array<any>): this {
+    notIn(values: any[]): this {
         return this._append({ $nin: values });
     }
     /**
@@ -1106,13 +1107,13 @@ class QueryExpression {
     }
     /**
      * @private
-     * @param {number|*} number
+     * @param {number|*} value
      * @param {number} length
      * @returns {*}
      */
-    static zeroPad(number: any, length: number): string {
-        number = number || 0;
-        let res = number.toString();
+    static zeroPad(value: any, length: number): string {
+        value = value || 0;
+        let res = value.toString();
         while (res.length < length) {
             res = '0' + res;
         }
@@ -1357,8 +1358,8 @@ class QueryExpression {
         }
         if (typeof val === 'object') {
             if (hasOwnProperty(val, '$name'))
-                //return field identifier
-                return val['$name'];
+                // return field identifier
+                return val.$name;
             else
                 return this.escape(val.valueOf());
         }

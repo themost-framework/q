@@ -26,7 +26,6 @@ class ODataParser {
     nextToken: any;
     previousToken: any;
     tokens: any[];
-    
 
     static get ArithmeticOperatorRegEx() {
         return /^(\$add|\$sub|\$mul|\$div|\$mod)$/g;
@@ -110,21 +109,21 @@ class ODataParser {
 
         const self = this;
         Object.defineProperty(this,'nextToken', {
-            get:function() {
+            get() {
                 return (self.offset < self.tokens.length - 1) ? self.tokens[self.offset+1] : null;
             },
             configurable:false, enumerable:false
         });
 
         Object.defineProperty(this,'previousToken', {
-            get:function() {
+            get() {
                 return ((self.offset > 0) && (self.tokens.length>0)) ? self.tokens[self.offset-1] : null;
         },
         configurable:false, enumerable:false
         });
 
         Object.defineProperty(this,'currentToken', {
-            get:function() {
+            get() {
                 return (self.offset < self.tokens.length) ? self.tokens[self.offset] : null;
         },
         configurable:false, enumerable:false
@@ -176,8 +175,10 @@ class ODataParser {
      */
     parse(str: string, callback: (err: Error) => void) {
         const self = this;
-        //ensure callback
-        callback = callback || (() => {});
+        // ensure callback
+        callback = callback || (() => {
+            //
+        });
         if (typeof str !== 'string')
         {
             callback.call(this);
@@ -198,11 +199,11 @@ class ODataParser {
          * @type {String}
          */
         this.source = str;
-        //get tokens
+        // get tokens
         this.tokens = this.toList();
-        //reset offset
+        // reset offset
         this.offset=0; this.current=0;
-        //invoke callback
+        // invoke callback
         this.parseCommon((err: Error, result?: any) => {
             try {
                 if (result) {
@@ -253,8 +254,10 @@ class ODataParser {
      */
     parseCommon(callback: (err?: Error, res?: any) => void) {
         const self = this;
-        //ensure callback
-        callback = callback || (() => {});
+        // ensure callback
+        callback = callback || (() => {
+            //
+        });
         if (self.tokens.length===0) {
             return callback.call(self);
         }
@@ -266,7 +269,7 @@ class ODataParser {
                 if (self.atEnd()) {
                     callback.call(self, null, result);
                 }
-                //method call exception for [,] or [)] tokens e.g indexOf(Title,'...')
+                // method call exception for [,] or [)] tokens e.g indexOf(Title,'...')
                 else if ((self.currentToken.syntax===SyntaxToken.Comma.syntax) ||
                     (self.currentToken.syntax===SyntaxToken.ParenClose.syntax)) {
                     callback.call(self, null, result);
@@ -278,22 +281,22 @@ class ODataParser {
                     }
                     else {
                         self.moveNext();
-                        self.parseCommonItem((err, right) => {
-                            if (err) {
-                                callback.call(self, err);
+                        self.parseCommonItem((err1, right) => {
+                            if (err1) {
+                                callback.call(self, err1);
                             }
                             else {
-                                //create odata expression
+                                // create odata expression
                                 const expr = self.createExpression(result, op, right);
                                 if (!self.atEnd() && (LogicalExpression.isLogicalOperator(self.getOperator(self.currentToken)))) {
                                     const op2 = self.getOperator(self.currentToken);
                                     self.moveNext();
-                                    return self.parseCommon((err, result) => {
-                                        if (err) {
-                                            return callback(err);
+                                    return self.parseCommon((err2, result2) => {
+                                        if (err2) {
+                                            return callback(err2);
                                         }
                                         else {
-                                            return callback.call(self, null, self.createExpression(expr, op2, result));
+                                            return callback.call(self, null, self.createExpression(expr, op2, result2));
                                         }
                                     });
                                 }
@@ -320,8 +323,7 @@ class ODataParser {
             {
                 if (left.operator===operator) {
                     expr = new LogicalExpression(operator);
-                    for (let i = 0; i < left.args.length; i++) {
-                        const o = left.args[i];
+                    for (const o of left.args) {
                         expr.args.push(o);
                     }
                     expr.args.push(right);
@@ -353,17 +355,19 @@ class ODataParser {
     parseCommonItem(callback: (err: Error, res?: any)=> void) {
         const self = this;
         let value;
-        //ensure callback
-        callback = callback || (() => {});
+        // ensure callback
+        callback = callback || (() => {
+            //
+        });
         if (self.tokens.length===0) {
             return callback.call(self);
         }
         switch (this.currentToken.type) {
             case Token.TokenType.Identifier:
-                //if next token is an open parenthesis token and the current token is not an operator. current=indexOf, next=(
+                // if next token is an open parenthesis token and the current token is not an operator. current=indexOf, next=(
                 if ((self.nextToken.syntax===SyntaxToken.ParenOpen.syntax) && (self.getOperator(self.currentToken) == null))
                 {
-                    //then parse method call
+                    // then parse method call
                     self.parseMethodCall(callback);
                 }
                 else if (self.getOperator(self.currentToken) === Token.Operator.Not)
@@ -379,8 +383,6 @@ class ODataParser {
                         }
                         else {
                             while (!self.atEnd() && self.currentToken.syntax===SyntaxToken.Slash.syntax) {
-                                //self.moveNext();
-                                //self.parseMembers(callback)
                                 callback.call(self,new Error('Slash syntax is not yet implemented.'));
                             }
                         }
@@ -424,13 +426,15 @@ class ODataParser {
 
     parseMethodCall(callback: (err?: Error, res?: any) => void) {
         const self = this;
-        //ensure callback
-        callback = callback || (() => {});
+        // ensure callback
+        callback = callback || (() => {
+            //
+        });
         if (this.tokens.length===0)
             callback.call(this);
         else
         {
-            //get method name
+            // get method name
             const method = self.currentToken.identifier;
             self.moveNext();
             self.expect(SyntaxToken.ParenOpen);
@@ -440,9 +444,9 @@ class ODataParser {
                     callback.call(self, err);
                 }
                 else {
-                    self.resolveMethod(method, args, (err, expr) => {
-                       if (err) {
-                           callback.call(self, err);
+                    self.resolveMethod(method, args, (err2, expr) => {
+                       if (err2) {
+                           callback.call(self, err2);
                        }
                        else {
                            if (expr == null)
@@ -459,8 +463,10 @@ class ODataParser {
 
     parseMethodCallArguments(args: any[], callback: (err?: Error) => void) {
         const self = this;
-        //ensure callback
-        callback = callback || (() => {});
+        // ensure callback
+        callback = callback || (() => {
+            //
+        });
         args = args || [];
         self.expectAny();
         if (self.currentToken.syntax===SyntaxToken.Comma.syntax) {
@@ -488,8 +494,10 @@ class ODataParser {
 
     parseMember(callback: (err?: Error, res?: any) => void) {
         const self = this;
-        //ensure callback
-        callback = callback || (() => {});
+        // ensure callback
+        callback = callback || (() => {
+            //
+        });
         if (this.tokens.length===0) {
             callback.call(this);
         }
@@ -500,21 +508,21 @@ class ODataParser {
             else {
                 let identifier = this.currentToken.identifier;
                 while (this.nextToken && this.nextToken.syntax===SyntaxToken.Slash.syntax) {
-                    //read syntax token
+                    // read syntax token
                     this.moveNext();
-                    //get next token
+                    // get next token
                     if (this.nextToken.type !== 'Identifier')
                         callback.call(self, new Error('Expected identifier.'));
-                    //read identifier token
+                    // read identifier token
                     this.moveNext();
-                    //format identifier
+                    // format identifier
                     identifier += '/' + this.currentToken.identifier;
                 }
-                //support member to member comparison (with $it identifier e.g. $it/address/city or $it/category etc)
+                // support member to member comparison (with $it identifier e.g. $it/address/city or $it/category etc)
                 if (/^\$it\//.test(identifier)) {
                     identifier= identifier.replace(/^\$it\//,'');
                 }
-                //search for multiple nested member expression (e.g. a/b/c)
+                // search for multiple nested member expression (e.g. a/b/c)
                 self.resolveMember(identifier, (err: Error, member: any) => {
                     callback.call(self, err, new MemberExpression(member));
                 });
@@ -529,7 +537,7 @@ class ODataParser {
      */
     resolveMember(member: string, callback: (err?: Error, res?: any) => void) {
         if (typeof callback !== 'function')
-            //sync process
+            // sync process
             return member;
         else
             callback.call(this, null, member);
@@ -544,24 +552,16 @@ class ODataParser {
      */
     resolveMethod(_method: any, _args: any, callback: (err?: Error, res?: any) => void): void {
         if (typeof callback !== 'function')
-            //sync process
+            // sync process
             return null;
         else
             callback.call(this);
     }
 
-    ///**
-    // * Resolves an equivalent expression based on the given OData token
-    // * @param {Token} token
-    // */
-    //ODataParser.prototype.resolveVariable = function(token, callback) {
-    //    return null;
-    //};
-
     /**
      * Get a collection of tokens by parsing the current expression
      */
-    toList(): Array<any> {
+    toList(): any[] {
         if (typeof this.source !== 'string')
             return [];
         this.current = 0;
@@ -719,7 +719,7 @@ class ODataParser {
             if (stringType !== LiteralToken.StringType.None && _source.charAt(_offset) === '\'')
             {
                 const content = this.parseString();
-                return this.parseSpecialString((<LiteralToken>content).value, stringType);
+                return this.parseSpecialString((content as LiteralToken).value, stringType);
             }
         }
         return new IdentifierToken(name);
@@ -747,8 +747,13 @@ class ODataParser {
         if (match)
         {
             // eslint-disable-next-line no-unused-vars
-            const negative = (match[1] === "-");
-            const year = match[2].length > 0 ? parseInt(match[2]) : 0, month = match[3].length > 0 ? parseInt(match[3]) : 0, day = match[4].length > 0 ? parseInt(match[4]) : 0, hour = match[5].length > 0 ? parseInt(match[5]) : 0, minute = match[6].length > 0 ? parseInt(match[6]) : 0, second = match[7].length > 0 ? parseFloat(match[7]) : 0;
+            // const negative = (match[1] === "-");
+            const year = match[2].length > 0 ? parseInt(match[2], 10) : 0;
+            const month = match[3].length > 0 ? parseInt(match[3], 10) : 0;
+            const day = match[4].length > 0 ? parseInt(match[4], 10) : 0;
+            const hour = match[5].length > 0 ? parseInt(match[5], 10) : 0;
+            const minute = match[6].length > 0 ? parseInt(match[6], 10) : 0;
+            const second = match[7].length > 0 ? parseFloat(match[7]) : 0;
             return new LiteralToken(new TimeSpan(year, month, day, hour, minute, second), LiteralToken.LiteralType.Duration);
         }
         else
@@ -757,7 +762,6 @@ class ODataParser {
         }
     }
 
-    
     parseBinaryString(_value: any): any {
         throw new Error('Not Implemented');
     }
@@ -939,7 +943,7 @@ class ODataParser {
 
                 case 'L':
                 case 'l':
-                    value = parseInt(text);
+                    value = parseInt(text, 10);
                     type = LiteralToken.LiteralType.Long;
                     _current++;
                     break;
@@ -952,7 +956,7 @@ class ODataParser {
                     }
                     else
                     {
-                        value = parseInt(text);
+                        value = parseInt(text, 10);
                         type = LiteralToken.LiteralType.Int;
                     }
                     break;
@@ -967,7 +971,7 @@ class ODataParser {
             }
             else
             {
-                value = parseInt(text);
+                value = parseInt(text, 10);
                 type = LiteralToken.LiteralType.Int;
             }
         }

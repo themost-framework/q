@@ -40,7 +40,7 @@ class QueryField {
                 // get first property
                 const key = getOwnPropertyName(arg);
                 // if key value is only a simple reference e.g. { "firstName": 1 }
-                if ((<PropertyIndexer>arg)[key] === 1) {
+                if ((arg as PropertyIndexer)[key] === 1) {
                     // return field reference name e.g. $firstName or $Person.$firstName
                     return this._toReference(key);
                 }
@@ -54,7 +54,7 @@ class QueryField {
         const thisName = getOwnPropertyName(this);
         // if name is a method reference e.g. { $day: "$dateCreated" } => $day
         const isMethod = isMethodOrNameReference(thisName);
-        const thisIndexer = (<PropertyIndexer>this);
+        const thisIndexer: PropertyIndexer = this;
         if (isMethod) {
             // assign previous property value to new method e.g.
             // { $min: { $day: "$dateCreated" } }
@@ -83,7 +83,7 @@ class QueryField {
             else {
                 // else use only field reference
                 value = thisIndexer[thisName];
-                Object.defineProperty(thisIndexer[method], this._toReference(thisName), { value: value, configurable: true, enumerable: true, writable: true });
+                Object.defineProperty(thisIndexer[method], this._toReference(thisName), { value, configurable: true, enumerable: true, writable: true });
             }
             // remove previous property reference
             delete thisIndexer[thisName];
@@ -104,7 +104,12 @@ class QueryField {
                 value = `$${thisName}`;
             }
             // set property descriptor
-            Object.defineProperty(this, `${method}`, { value: value, configurable: true, enumerable: true, writable: true });
+            Object.defineProperty(this, `${method}`, {
+                value,
+                configurable: true,
+                enumerable: true,
+                writable: true
+            });
             // remove previous property
             delete thisIndexer[thisName];
             // and return

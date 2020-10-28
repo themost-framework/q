@@ -2,7 +2,6 @@
 import { PropertyIndexer } from "./query";
 
 class ArithmeticExpression {
-    
     static readonly ArithmeticOperators = [ "$add", "$subtract", "$multiply", "$divide", "$mod", "$bit" ];
 
     static isArithmeticOperator(operator: string): boolean {
@@ -27,7 +26,7 @@ class ArithmeticExpression {
         if (!ArithmeticExpression.isArithmeticOperator(this.operator)) {
             throw new Error('Invalid arithmetic operator.');
         }
-        //build right operand e.g. { $add:[ 5 ] }
+        // build right operand e.g. { $add:[ 5 ] }
         const result: PropertyIndexer = { };
         Object.defineProperty(result, this.operator, {
             value: [ this.left.exprOf(), this.right.exprOf() ],
@@ -37,7 +36,7 @@ class ArithmeticExpression {
         if (this.right == null) {
             result[this.operator]=[null];
         }
-        //return query expression
+        // return query expression
         return result;
     }
 }
@@ -57,14 +56,14 @@ class MemberExpression {
 class LogicalExpression {
 
     static readonly LogicalOperators = [ "$and", "$or", "$not", "$nor" ];
-    
+
     static isLogicalOperator(operator: string): boolean {
         return LogicalExpression.LogicalOperators.indexOf(operator) >= 0;
     }
 
     public operator: string;
-    public args: Array<any>;
-    constructor(operator: string, args?: Array<any>) {
+    public args: any[];
+    constructor(operator: string, args?: any[]) {
         this.operator = operator || '$and' ;
         this.args = args || [];
     }
@@ -76,10 +75,9 @@ class LogicalExpression {
             throw new Error('Logical expression arguments cannot be null at this context.');
         if (this.args.length===0)
             throw new Error('Logical expression arguments cannot be empty.');
-        const p = <PropertyIndexer>{};
+        const p: PropertyIndexer = {};
         p[this.operator] = [];
-        for (let i = 0; i < this.args.length; i++) {
-            const arg = this.args[i];
+        for (const arg of this.args) {
             if (arg == null)
                 p[this.operator].push(null);
             else if (typeof arg.exprOf === 'function')
@@ -106,7 +104,7 @@ class LiteralExpression {
     exprOf() {
         if (typeof this.value === 'undefined') {
             return null;
-        }  
+        }
         return this.value;
     }
 }
@@ -136,17 +134,13 @@ class ComparisonExpression {
         if ((this.left instanceof MethodCallExpression) ||
             (this.left instanceof ArithmeticExpression))
         {
-            p = <PropertyIndexer>{};
+            p = {};
             p[this.operator] = [];
             p[this.operator].push(this.left.exprOf());
-            if (this.right && typeof this.right.exprOf === 'function')
-            {
+            if (this.right && typeof this.right.exprOf === 'function') {
                 p[this.operator].push(this.right.exprOf());
-            }
-            else
-            {
+            } else {
                 p[this.operator].push(this.right == null ? null : this.right);
-                
             }
             return p;
         }
@@ -174,8 +168,8 @@ class ComparisonExpression {
 
 class MethodCallExpression {
     public name: string;
-    public args: Array<any>;
-    constructor(name: string, args: Array<any>) {
+    public args: any[];
+    constructor(name: string, args: any[]) {
         /**
          * Gets or sets the name of this method
          * @type {String}
@@ -197,7 +191,7 @@ class MethodCallExpression {
     exprOf(): any {
         const method: PropertyIndexer = {};
         const name = '$'.concat(this.name);
-        //set arguments array
+        // set arguments array
         if (this.args.length===0)
             throw new Error('Unsupported method expression. Method arguments cannot be empty.');
         if (this.args.length === 1) {
@@ -262,7 +256,7 @@ class ObjectExpression {
     }
     exprOf() {
         const finalResult = { };
-        const thisIndexer = <PropertyIndexer>this;
+        const thisIndexer: PropertyIndexer = this;
         Object.keys(this).forEach( key => {
             if (typeof thisIndexer[key].exprOf === 'function') {
                 Object.defineProperty(finalResult, key, {

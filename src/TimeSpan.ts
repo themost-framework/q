@@ -17,7 +17,7 @@ class TimeSpan {
         this.seconds = seconds;
     }
     toString() {
-
+        //
     }
 }
 

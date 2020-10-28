@@ -1,3 +1,5 @@
+import { PropertyIndexer } from "./query";
+
 // MOST Web Framework Codename ZeroGravity, copyright 2017-2020 THEMOST LP all rights reserved
 
 class PrototypeMethodParser {
@@ -6,8 +8,9 @@ class PrototypeMethodParser {
         if (name === 'toString') {
             return;
         }
-        if (typeof (<any>this)[name] === 'function') {
-            return (<any>this)[name];
+        const thisArg: PropertyIndexer = this;
+        if (typeof thisArg[name] === 'function') {
+            return thisArg[name];
         }
     }
  }

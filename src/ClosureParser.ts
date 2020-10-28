@@ -87,18 +87,18 @@ class ClosureParser {
      * @param {Function} func The closure expression to parse
      * @param {*} params An object which represents closure parameters
      */
-    parseSelect(func: Function, params?: any) {
+    parseSelect(func: () => void, params?: any) {
         if (func == null) {
             return;
         }
         this.params = params;
         Args.check(typeof func === 'function', new Error('Select closure must a function.'));
-        //convert the given function to javascript expression
+        // convert the given function to javascript expression
         const expr = parseScript('void(' + func.toString() + ')');
-        //validate expression e.g. return [EXPRESSION];
+        // validate expression e.g. return [EXPRESSION];
         const body: any = expr.body[0];
         const funcExpr = body.expression.argument;
-        //get named parameters
+        // get named parameters
         this.namedParams = funcExpr.params;
         const res: PropertyIndexer = this.parseCommon(funcExpr.body);
         if (res && res instanceof SequenceExpression) {
@@ -117,7 +117,7 @@ class ClosureParser {
                         configurable: true,
                         enumerable: true,
                         writable: true,
-                        value: (<PropertyIndexer>res)[key].exprOf()
+                        value: (res as PropertyIndexer)[key].exprOf()
                     })
                     return result;
                 }
@@ -131,34 +131,34 @@ class ClosureParser {
      * @param {Function} func The closure expression to parse
      * @param {*} params An object which represents closure parameters
      */
-    parseFilter(func: Function, params?: any) {
+    parseFilter(func: () => void, params?: any) {
         const self = this;
         if (func == null) {
             return;
         }
         this.params = params;
-        //convert the given function to javascript expression
+        // convert the given function to javascript expression
         const expr = parseScript('void(' + func.toString() + ')');
-        //get FunctionExpression
+        // get FunctionExpression
         const body: any = expr.body[0];
         const fnExpr = body.expression.argument;
         if (fnExpr == null) {
             throw new Error('Invalid closure statement. Closure expression cannot be found.');
         }
-        //get named parameters
+        // get named parameters
         self.namedParams = fnExpr.params;
-        //validate expression e.g. return [EXPRESSION];
+        // validate expression e.g. return [EXPRESSION];
         if (fnExpr.body.type === ExpressionTypes.MemberExpression) {
             return this.parseMember(fnExpr.body);
         }
-        //validate expression e.g. return [EXPRESSION];
+        // validate expression e.g. return [EXPRESSION];
         if (fnExpr.body.body[0].type!==ExpressionTypes.ReturnStatement) {
             throw new Error('Invalid closure syntax. A closure expression must return a value.');
         }
         const closureExpr =  fnExpr.body.body[0].argument;
-        //parse this expression
+        // parse this expression
         const result = this.parseCommon(closureExpr);
-        //and finally return the equivalent query expression
+        // and finally return the equivalent query expression
         if (result && typeof result.exprOf === 'function') {
                 return result.exprOf();
         }
@@ -204,7 +204,7 @@ class ClosureParser {
         if (Array.isArray(objectExpression.properties) === false) {
             throw new Error('Object expression properties must be an array.');
         }
-        let finalResult = new ObjectExpression();
+        const finalResult = new ObjectExpression();
         objectExpression.properties.forEach( (property: any) => {
             const value = self.parseCommon(property.value);
             let name;
@@ -221,7 +221,7 @@ class ClosureParser {
                 throw new Error(`Invalid property key type. Expected Literal or Identifier. Found ${property.key.type}.`);
             }
             Object.defineProperty(finalResult, name, {
-                value: value,
+                value,
                 enumerable: true,
                 configurable: true
             });
@@ -244,7 +244,7 @@ class ClosureParser {
         if (Array.isArray(sequenceExpression.expressions) === false) {
             throw new Error('Sequence expression expressions must be an array.');
         }
-        let finalResult = new SequenceExpression();
+        const finalResult = new SequenceExpression();
         sequenceExpression.expressions.forEach( (expression: any) => {
             finalResult.value.push(self.parseCommon(expression));
         });
@@ -282,8 +282,8 @@ class ClosureParser {
             throw new Error('Invalid logical expression. Left or right operand is missing or undefined.');
         }
         else {
-            let left = self.parseCommon(expr.left);
-            let right = self.parseCommon(expr.right);
+            const left = self.parseCommon(expr.left);
+            const right = self.parseCommon(expr.right);
             // create expression
             return new LogicalExpression(op, [left, right]);
         }
@@ -334,12 +334,12 @@ class ClosureParser {
             throw new Error('Invalid binary operator.');
         }
         else {
-            let left = self.parseCommon(expr.left);
-            let right = self.parseCommon(expr.right);
+            const left = self.parseCommon(expr.left);
+            const right = self.parseCommon(expr.right);
             if (ArithmeticExpression.isArithmeticOperator(op)) {
-                //validate arithmetic arguments
+                // validate arithmetic arguments
                 if (instanceOf(left, LiteralExpression) && instanceOf(right, LiteralExpression)) {
-                    //evaluate expression
+                    // evaluate expression
                     switch (op) {
                         case Operators.Add:
                             return left.value + right.value;
@@ -352,6 +352,7 @@ class ClosureParser {
                         case Operators.Mod:
                             return left.value % right.value;
                         case Operators.BitAnd:
+                            // tslint:disable-next-line:no-bitwise
                             return left.value & right.value;
                         default:
                             throw new Error('Invalid arithmetic operator');
@@ -379,24 +380,24 @@ class ClosureParser {
                 throw new Error('Invalid or missing closure parameter');
             }
             if (expr.object.name===namedParam.name) {
-                let member = self.resolveMember(expr.property.name);
+                const member = self.resolveMember(expr.property.name);
                 return new MemberExpression(member);
             }
             else {
                 let value;
                 if (expr.object.object == null) {
-                    //evaluate object member value e.g. item.title or item.status.id
+                    // evaluate object member value e.g. item.title or item.status.id
                     value = memberExpressionToString(expr);
                     return new MemberExpression(value);
                 }
                 if (expr.object.object.name===namedParam.name) {
-                    //get closure parameter expression e.g. x.title.length
+                    // get closure parameter expression e.g. x.title.length
                     const property = expr.property.name;
                     const result: any = self.parseMember(expr.object);
                     return new MethodCallExpression(property, [result]);
                 }
                 else {
-                    //evaluate object member value e.g. item.title or item.status.id
+                    // evaluate object member value e.g. item.title or item.status.id
                     value = memberExpressionToString(expr);
                     return new LiteralExpression(value);
                 }
@@ -417,8 +418,8 @@ class ClosureParser {
         if (expr.callee.object == null) {
             throw new Error('Invalid or unsupported method expression.');
         }
-        let method = expr.callee.property.name;
-        let result = self.parseMember(expr.callee.object);
+        const method = expr.callee.property.name;
+        const result = self.parseMember(expr.callee.object);
         const args = [result];
         expr.arguments.forEach( (arg: any) => {
             args.push(self.parseCommon(arg));
@@ -458,7 +459,6 @@ class ClosureParser {
         }
         const args: any[] = [];
         let needsEvaluation = true;
-        let thisName: string;
         if (name == null) {
             if (expr.callee.object != null) {
                 if (expr.callee.object.object != null) {
@@ -468,11 +468,10 @@ class ClosureParser {
                 }
             }
             name = memberExpressionToString(expr.callee);
-            thisName = parentMemberExpressionToString(expr.callee);
         }
-        //get arguments
+        // get arguments
         expr.arguments.forEach((arg: any) => {
-            let result = self.parseCommon(arg);
+            const result = self.parseCommon(arg);
             args.push(result);
             if (!instanceOf(result, LiteralExpression)) {
                 needsEvaluation = false;
@@ -545,8 +544,7 @@ function memberExpressionToString(expr: any): string {
 function parentMemberExpressionToString(expr: any): string {
     if (expr.object.object == null) {
         return expr.object.name;
-    }
-    else {
+    } else {
         return memberExpressionToString(expr.object);
     }
 }

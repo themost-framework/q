@@ -12,16 +12,16 @@ class MathJsMethodParser {
     public prefix: any[];
     constructor() {
         // test mathjs
-        let func1 = function() {
+        const func1 = () => {
             return floor(1);
         };
-        let expr = parseScript(`void(${func1.toString()})`);
+        const expr = parseScript(`void(${func1.toString()})`);
         // get method call to find out name of mathjs
-        const body = <any>expr.body[0];
-        let identifier = body.expression.argument.body.body[0].argument.callee;
+        const body = expr.body[0] as any;
+        const identifier = body.expression.argument.body.body[0].argument.callee;
         this.prefix = [];
         if (Array.isArray(identifier.expressions)) {
-            let callee = identifier.expressions[1];
+            const callee = identifier.expressions[1];
             this.prefix.push(new RegExp(`^${callee.object.name}\\.(\\w+)`, 'g'));
         }
         // add mathjs prefix
@@ -33,7 +33,7 @@ class MathJsMethodParser {
             return prefix.test(name);
         });
         if (findPrefix) {
-            const staticIndexer = <PropertyIndexer>MathJsMethodParser;
+            const staticIndexer: PropertyIndexer = MathJsMethodParser;
             const method = name.replace(findPrefix, '$1');
             if (typeof staticIndexer[method] === 'function') {
                 return staticIndexer[method];

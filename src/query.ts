@@ -8,14 +8,14 @@ const REFERENCE_REGEXP = /^\$/;
 // noinspection JSUnusedGlobalSymbols
 /**
  * Returns a string which represents the name of the first property of an object
- * @param {*} any
+ * @param {*} obj
  * @returns {*}
  */
-function getOwnPropertyName(any: any): string {
-    if (any) {
+function getOwnPropertyName(obj: any): string {
+    if (obj) {
         // noinspection LoopStatementThatDoesntLoopJS
-        for(let key in any) {
-            if  (hasOwnProperty(any, key)) {
+        for(const key in obj) {
+            if  (hasOwnProperty(obj, key)) {
                 return key;
             }
         }
@@ -50,14 +50,14 @@ function hasNameReference(str: string): string {
 /**
  * Returns a string which indicates that the given object has a property with a name reference
  * e.g. $UserTable, $name etc.
- * @param {*} any
+ * @param {*} obj
  * @returns {string|*}
  */
-function getOwnPropertyWithNameRef(any: any): string {
-    if (any) {
-        // noinspection LoopStatementThatDoesntLoopJS
-        for(let key in any) {
-            if (Object.prototype.hasOwnProperty.call(any, key) && REFERENCE_REGEXP.test(key)) {
+function getOwnPropertyWithNameRef(obj: any): string {
+    if (obj) {
+        // tslint:disable-next-line:forin
+        for(const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key) && REFERENCE_REGEXP.test(key)) {
                 return key;
             }
             break;

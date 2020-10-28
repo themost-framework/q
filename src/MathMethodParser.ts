@@ -18,7 +18,7 @@ class MathMethodParser {
         });
         if (findPrefix) {
             const method = name.replace(findPrefix, '$1');
-            const staticIndexer = <PropertyIndexer>MathMethodParser;
+            const staticIndexer: PropertyIndexer = MathMethodParser;
             if (typeof staticIndexer[method] === 'function') {
                 return staticIndexer[method];
             }

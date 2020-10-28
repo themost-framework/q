@@ -43,7 +43,7 @@ class ODataQuery {
     toString() {
         Args.check(this.$collection != null, new Error('Query collection cannot be empty at this context'));
         const uri = this.getCollection();
-        const params = <PropertyIndexer>this.getParams();
+        const params: PropertyIndexer = this.getParams();
         let search = '';
         for (const key in params) {
             if (hasOwnProperty(params, key)) {
@@ -57,8 +57,8 @@ class ODataQuery {
     }
 
     toExpand() {
-        let collection = this.getCollection();
-        const params = <PropertyIndexer>this.getParams();
+        const collection = this.getCollection();
+        const params: PropertyIndexer = this.getParams();
         let search = '';
         for (const key in params) {
             if (hasOwnProperty(params, key)) {
@@ -333,9 +333,9 @@ class ODataQuery {
         Args.notNull(args, 'Attributes');
         Args.check(args.length > 0, 'Attributes may not be empty');
         const arr = [];
-        for (let i = 0; i < args.length; i++) {
-            Args.check(typeof args[i] === 'string', 'Invalid attribute. Expected string.');
-            arr.push(args[i]);
+        for (const arg of args) {
+            Args.check(typeof arg === 'string', 'Invalid attribute. Expected string.');
+            arr.push(arg);
         }
         this._params.$select = arr.join(',');
         return this;
@@ -346,9 +346,9 @@ class ODataQuery {
         Args.notNull(args, 'Attributes');
         Args.check(args.length > 0, 'Attributes may not be empty');
         const arr = [];
-        for (let i = 0; i < args.length; i++) {
-            Args.check(typeof args[i] === 'string', 'Invalid attribute. Expected string.');
-            arr.push(args[i]);
+        for (const arg of args) {
+            Args.check(typeof arg === 'string', 'Invalid attribute. Expected string.');
+            arr.push(arg);
         }
         this._params.$groupby = arr.join(',');
         return this;
@@ -359,9 +359,9 @@ class ODataQuery {
         Args.notNull(args, 'Attributes');
         Args.check(args.length > 0, 'Attributes may not be empty');
         const arr = [];
-        for (let i = 0; i < args.length; i++) {
-            Args.check(typeof args[i] === 'string', 'Invalid attribute. Expected string.');
-            arr.push(args[i]);
+        for (const arg of args) {
+            Args.check(typeof arg === 'string', 'Invalid attribute. Expected string.');
+            arr.push(arg);
         }
         this._params.$expand = arr.join(',');
         return this;

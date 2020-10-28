@@ -3,7 +3,7 @@ import {Token} from "./Token";
 
 class LiteralToken extends Token {
 
-    static get LiteralType() 
+    static get LiteralType()
     {
         return {
             Null: 'Null',
@@ -20,7 +20,7 @@ class LiteralToken extends Token {
             Duration: 'Duration'
         }
     }
-    
+
     static get StringType() {
         return {
             None: 'None',
@@ -32,28 +32,28 @@ class LiteralToken extends Token {
         };
     }
 
-    static get PositiveInfinity() { 
+    static get PositiveInfinity() {
         return new LiteralToken(NaN, LiteralToken.LiteralType.Double);
-    } 
-    static get NegativeInfinity() { 
+    }
+    static get NegativeInfinity() {
         return new LiteralToken(NaN, LiteralToken.LiteralType.Double);
-    } 
-    static get NaN() { 
+    }
+    static get NaN() {
         return new LiteralToken(NaN, LiteralToken.LiteralType.Double);
-    } 
-    static get True() { 
+    }
+    static get True() {
         return new LiteralToken(true, LiteralToken.LiteralType.Boolean);
-    } 
-    static get False() { 
+    }
+    static get False() {
         return new LiteralToken(false, LiteralToken.LiteralType.Boolean);
-    } 
-    static get Null() { 
+    }
+    static get Null() {
         return new LiteralToken(null, LiteralToken.LiteralType.Null);
-    } 
+    }
 
     public value: any;
     public literalType: string;
-    
+
     constructor(value: any, literalType: any) {
         super(Token.TokenType.Literal);
         this.value = value;

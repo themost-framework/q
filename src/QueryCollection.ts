@@ -27,9 +27,9 @@ class QueryCollection {
      */
     get name(): string {
         // get first property
-        let key = getOwnPropertyName(this);
+        const key = getOwnPropertyName(this);
         Args.notNull(key, 'Collection');
-        const thisIndexer = (<PropertyIndexer>this);
+        const thisIndexer: PropertyIndexer = this;
         if (thisIndexer[key] === 1) {
             // simple collection reference e.g. { "Person": 1 }
             return key;
@@ -46,9 +46,9 @@ class QueryCollection {
      */
     get alias(): string {
         // get first property
-        let key = getOwnPropertyName(this);
+        const key = getOwnPropertyName(this);
         Args.notNull(key, 'Collection');
-        const thisIndexer = (<PropertyIndexer>this);
+        const thisIndexer: PropertyIndexer = this;
         if (thisIndexer[key] === 1) {
             // simple collection reference e.g. { "Person": 1 }
             return null;
@@ -64,7 +64,7 @@ class QueryCollection {
         Args.notString(alias, 'Alias');
         const key = getOwnPropertyName(this);
         Args.notNull(key, 'Collection');
-        const thisIndexer = (<PropertyIndexer>this);
+        const thisIndexer: PropertyIndexer = this;
         // if collection name is a single expression e.g. { "Person": 1 }
         if (thisIndexer[key] === 1) {
             // convert collection reference to { "People": "$Person" }

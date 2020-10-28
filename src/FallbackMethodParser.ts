@@ -9,7 +9,7 @@ class FallbackMethodParser {
             return;
         }
         const method = matches[1];
-        const staticIndexer = <PropertyIndexer>FallbackMethodParser;
+        const staticIndexer: PropertyIndexer = FallbackMethodParser;
         if (typeof staticIndexer[method] === 'function') {
             return staticIndexer[method];
         }

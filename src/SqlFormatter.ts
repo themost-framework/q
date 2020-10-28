@@ -79,18 +79,12 @@ class SqlFormatter {
         }
     }
 
-    /**
-    * Escapes an object or a value and returns the equivalent sql value.
-    * @param {*} value - A value that is going to be escaped for SQL statements
-    * @param {boolean=} unquoted - An optional value that indicates whether the resulted string will be quoted or not.
-    * @returns {string} - The equivalent SQL string value
-    */
     escape(value: any, unquoted?: boolean): string {
         if (value == null)
             return SqlUtils.escape(null);
-        const thisIndexer = <PropertyIndexer>this;
+        const thisIndexer: PropertyIndexer = this;
         if (typeof value === 'object') {
-            //add an exception for Date object
+            // add an exception for Date object
             if (value instanceof Date) {
                 return SqlUtils.escape(value);
             }
@@ -100,7 +94,6 @@ class SqlFormatter {
                     // get literal property
                     const literalProperty = getOwnPropertyName(value.$literal);
                     // if literal is an expression e.g. { $add: [ 100, 45 ] }
-                    
                     if (literalProperty && isMethodOrNameReference(literalProperty)) {
                         // if expression is a formatter method e.g. $add
                         if (typeof thisIndexer[literalProperty] === 'function') {
@@ -115,9 +108,9 @@ class SqlFormatter {
                 return this.escapeName(value.$name);
             }
             else {
-                //check if value is a known expression e.g. { $length: "name" }
+                // check if value is a known expression e.g. { $length: "name" }
                 const key = getOwnPropertyName(value);
-                if ((typeof key === 'string') && /^\$/.test(key) && (typeof thisIndexer[key] == 'function')) {
+                if ((typeof key === 'string') && /^\$/.test(key) && (typeof thisIndexer[key] === 'function')) {
                     const formatFunc = thisIndexer[key];
                     if (Array.isArray(value[key])) {
                         return formatFunc.apply(this, value[key]);
@@ -334,7 +327,7 @@ class SqlFormatter {
      */
     formatLimitSelect(expr: any): string {
 
-        let sql=this.formatSelect(expr);
+        const sql=this.formatSelect(expr);
         if (expr.$limit) {
             if (expr.$skip) {
                 return sql + ` LIMIT ${expr.$skip}, ${expr.$limit}`
@@ -417,9 +410,9 @@ class SqlFormatter {
 
     formatField(expr: any): string {
         Args.notNull(expr, 'Field expression');
-        let name = getOwnPropertyName(expr);
+        const name = getOwnPropertyName(expr);
         let result;
-        const thisIndexer = <PropertyIndexer>this;
+        const thisIndexer: PropertyIndexer = this;
         Args.check(name != null, new Error('Field name cannot be empty.'));
         // field expression is simple select e.g. { "dateCreated" : 1 }
         if (expr[name] === 1) {
@@ -436,7 +429,7 @@ class SqlFormatter {
         }
         if (typeof field === 'object') {
             // field has an expression e.g. { "minPrice": { "$min": "$price" } }
-            let funcName = getOwnPropertyName(field);
+            const funcName = getOwnPropertyName(field);
             if (isMethodOrNameReference(funcName)) {
                 const formatFunc = thisIndexer[funcName];
                 if (typeof formatFunc === 'function') {
@@ -477,7 +470,7 @@ class SqlFormatter {
         // get expression property e.g. { "givenName": { "$eq" : "John" } }
         // => givenName or { "$length" : "$givenName" } => $length
         const name = getOwnPropertyName(expr);
-        const thisIndexer = <PropertyIndexer>this;
+        const thisIndexer: PropertyIndexer = this;
         // if name is a method reference
         if (isMethodOrNameReference(name)) {
             // get format method
@@ -557,7 +550,7 @@ class SqlFormatter {
     // noinspection JSUnusedGlobalSymbols
     formatInsert(query: any): string {
         Args.check(query.$insert != null, new ExpectedInsertExpression());
-        //get collection name
+        // get collection name
         Args.check(query.$collection != null, new ExpectedCollection());
         const collection = Object.assign(new QueryCollection(), query.$collection);
         Args.notNull(collection.name, 'Collection name');
@@ -579,7 +572,7 @@ class SqlFormatter {
     // noinspection JSUnusedGlobalSymbols
     formatUpdate(query: any): string {
         Args.check(query.$update != null, new ExpectedUpdateExpression());
-        //get collection name
+        // get collection name
         Args.check(query.$collection != null, new ExpectedCollection());
         const collection = Object.assign(new QueryCollection(), query.$collection);
         Args.notNull(collection.name, 'Collection name');
@@ -616,7 +609,7 @@ class SqlFormatter {
     // noinspection JSUnusedGlobalSymbols
     formatDelete(query: any): string {
         Args.check(query.$delete != null, new ExpectedDeleteExpression());
-        //get collection name
+        // get collection name
         Args.check(query.$collection != null, new ExpectedCollection());
         const collection = Object.assign(new QueryCollection(), query.$collection);
         Args.notNull(collection.name, 'Collection name');

@@ -12,12 +12,12 @@ function convertTimezone(tz: string) {
     return false;
 }
 
-function zeroPad(number: any, length?: number) {
-    number = number.toString();
-    while (number.length < length) {
-        number = '0' + number;
+function zeroPad(value: any, length?: number) {
+    value = value.toString();
+    while (value.length < length) {
+        value = '0' + value;
     }
-    return number;
+    return value;
 }
 
 function dateToString(date: Date, timeZone: string) {
@@ -50,8 +50,7 @@ function bufferToString(buffer: Buffer) {
         hex = buffer.toString('hex');
     } catch (err) {
         // node v0.4.x does not support hex / throws unknown encoding error
-        for (let i = 0; i < buffer.length; i++) {
-            const byte = buffer[i];
+        for (const byte of buffer) {
             // noinspection JSCheckFunctionSignatures
             hex += zeroPad(byte.toString(16));
         }
@@ -74,7 +73,7 @@ function objectToValues(object: any, timeZone: any) {
     return values.join(', ');
 }
 
-function arrayToList(array: Array<any>, timeZone: string): string {
+function arrayToList(array: any[], timeZone: string): string {
     return array.map(v => {
         if (Array.isArray(v)) return '(' + arrayToList(v, timeZone) + ')';
         return escape(v, true, timeZone);
@@ -168,12 +167,12 @@ class SqlUtils {
         return escape(val);
     }
 
-    static format(sql: string, values: Array<any>) {
+    static format(sql: string, values: any[]) {
         return format(sql, values);
     }
 
-    static zeroPad(number: any, length?: number) {
-        return zeroPad(number, length);
+    static zeroPad(value: any, length?: number) {
+        return zeroPad(value, length);
     }
 }
 
