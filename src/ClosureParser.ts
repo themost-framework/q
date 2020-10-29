@@ -84,10 +84,10 @@ class ClosureParser {
     }
     /**
      * Parses a javascript expression and returns the equivalent select expression.
-     * @param {Function} func The closure expression to parse
+     * @param {*} func The closure expression to parse
      * @param {*} params An object which represents closure parameters
      */
-    parseSelect(func: () => void, params?: any) {
+    parseSelect(func: any, params?: any) {
         if (func == null) {
             return;
         }

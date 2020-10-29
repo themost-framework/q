@@ -17,8 +17,12 @@ class MathJsMethodParser {
         };
         const expr = parseScript(`void(${func1.toString()})`);
         // get method call to find out name of mathjs
-        const body = expr.body[0] as any;
-        const identifier = body.expression.argument.body.body[0].argument.callee;
+        const exprBody = (expr as any).body[0].expression.argument.body as any;
+        const exprReturnStatement = exprBody.body.find((x: any) => x.type === 'ReturnStatement');
+        if (exprReturnStatement == null) {
+            throw new Error('Expression return statement cannot be found.');
+        }
+        const identifier = exprReturnStatement.argument.callee;
         this.prefix = [];
         if (Array.isArray(identifier.expressions)) {
             const callee = identifier.expressions[1];

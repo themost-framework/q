@@ -109,8 +109,10 @@ function escape(val: any, stringifyObjects?: boolean, timeZone?: string): string
         val = dateToString(val, timeZone || 'local');
     }
 
-    if (Buffer.isBuffer(val)) {
-        return bufferToString(val);
+    if (typeof Buffer !== 'undefined') {
+        if (Buffer.isBuffer(val)) {
+            return bufferToString(val);
+        }
     }
 
     if (Array.isArray(val)) {

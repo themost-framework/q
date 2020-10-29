@@ -44,7 +44,12 @@ class QueryExpression {
     $skip: number;
 
     constructor() {
-        //
+        Object.defineProperty(this, 'privates', {
+            enumerable: false,
+            configurable: false,
+            writable: false,
+            value: {}
+        });
     }
     /**
      * Clones the current expression and returns a new QueryExpression object.
