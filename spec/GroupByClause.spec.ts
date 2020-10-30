@@ -8,7 +8,7 @@ describe('Aggregate Functions', () => {
         await initDatabase();
     });
     it('should use groupBy()', async () => {
-        let a = new QueryExpression().select( (x: { CustomerID: any; Country: any; }) => {
+        const a = new QueryExpression().select( (x: { CustomerID: any; Country: any; }) => {
             return {
                 // eslint-disable-next-line no-undef
                 TotalCustomers: count(x.CustomerID),
@@ -19,17 +19,17 @@ describe('Aggregate Functions', () => {
         .groupBy ( (x: { Country: any; }) => {
             x.Country
         });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeTruthy();
     });
     it('should use groupBy() with join()', async () => {
         const Shippers = new QueryCollection('Shippers');
         const Orders = new QueryCollection('Orders');
-        let a = new QueryExpression().select( (x: { OrderID: any; }) => {
+        const a = new QueryExpression().select( (x: { OrderID: any; }) => {
             return {
                 // eslint-disable-next-line no-undef
                 TotalOrders: count(x.OrderID),
-                ShipperName: (<any>Shippers).ShipperName
+                ShipperName: (Shippers as any).ShipperName
             }
         }, {
             Shippers
@@ -42,11 +42,11 @@ describe('Aggregate Functions', () => {
          )
         // eslint-disable-next-line no-unused-vars
         .groupBy ( (x: any) => {
-            (<any>Shippers).ShipperName
+            (Shippers as any).ShipperName
         }, {
             Shippers
         });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeTruthy();
     });
 });

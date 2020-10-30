@@ -1,5 +1,5 @@
-// MOST Web Framework Codename ZeroGravity, copyright 2017-2020 THEMOST LP all rights reserved 
-
+// MOST Web Framework Codename ZeroGravity, copyright 2017-2020 THEMOST LP all rights reserved
+export * from './math';
 export * from './QueryAdapter';
 export * from './QueryField';
 export * from './QueryCollection';

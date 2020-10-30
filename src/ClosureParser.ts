@@ -39,13 +39,6 @@ const ExpressionTypes = {
     ObjectExpression:'ObjectExpression',
     SequenceExpression:'SequenceExpression'
 };
-/**
- * @param {...*} args
- * @returns {number}
- */
-function count(...args: any[]): number {
-    return args.length;
-}
 
 // // extend StaticMethodParser
 // const properties = Object.getOwnPropertyDescriptors(MathJsMethodParser);
@@ -550,6 +543,5 @@ function parentMemberExpressionToString(expr: any): string {
 }
 
 export {
-    count,
     ClosureParser
 }

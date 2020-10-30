@@ -1,7 +1,5 @@
 import { QueryExpression } from '../src';
 
-// eslint-disable-next-line no-unused-vars
-import { round, ceil, floor, mod, multiply, subtract, divide, add, bitAnd, min, max } from 'mathjs';
 import { MemoryAdapter } from './TestMemoryAdapter';
 import { initDatabase } from './TestMemoryDatabase';
 
@@ -10,7 +8,7 @@ describe('ClosureParser.parseFilter()', () => {
         await initDatabase();
     });
     it('should use object property to an equal expression', async () => {
-        let a = new QueryExpression().select( (x: { CustomerID: any; CustomerName: any; }) => {
+        const a = new QueryExpression().select( (x: { CustomerID: any; CustomerName: any; }) => {
             x.CustomerID,
             x.CustomerName
         })
@@ -20,15 +18,15 @@ describe('ClosureParser.parseFilter()', () => {
         expect(a.$match).toEqual({
                 "CustomerID": { "$eq": 78 }
             });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result).toBeTruthy();
         expect(result.length).toBe(1);
         expect(result[0].CustomerID).toBe(78);
-        
+
     });
 
     it('should use object property to an equal expression', async () => {
-        let a = new QueryExpression().select( (x: { CustomerID: any; CustomerName: any; }) => {
+        const a = new QueryExpression().select( (x: { CustomerID: any; CustomerName: any; }) => {
             return {
                 CustomerID: x.CustomerID,
                 Name: x.CustomerName
@@ -37,7 +35,7 @@ describe('ClosureParser.parseFilter()', () => {
         .from('Customers').where( (x: { CustomerID: number; }) => {
             return x.CustomerID === 78;
         });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result).toBeTruthy();
         expect(result.length).toBe(1);
         expect(result[0].CustomerID).toBe(78);
@@ -45,7 +43,7 @@ describe('ClosureParser.parseFilter()', () => {
     });
 
     it('should use greater than expression', async () => {
-        let a = new QueryExpression().select( (x: { CustomerID: any; CustomerName: any; ContactName: any; }) => {
+        const a = new QueryExpression().select( (x: { CustomerID: any; CustomerName: any; ContactName: any; }) => {
             x.CustomerID,
             x.CustomerName,
             x.ContactName
@@ -53,14 +51,14 @@ describe('ClosureParser.parseFilter()', () => {
         .from('Customers').where( (x: { CustomerID: number; }) => {
             return x.CustomerID > 78;
         });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeTruthy();
         result.forEach( (x: { CustomerID: any; }) => {
             expect(x.CustomerID).toBeGreaterThan(78);
         });
     });
     it('should use lower than expression', async () => {
-        let a = new QueryExpression().select( (x: { CustomerID: any; CustomerName: any; ContactName: any; }) => {
+        const a = new QueryExpression().select( (x: { CustomerID: any; CustomerName: any; ContactName: any; }) => {
             x.CustomerID,
             x.CustomerName,
             x.ContactName
@@ -68,7 +66,7 @@ describe('ClosureParser.parseFilter()', () => {
         .from('Customers').where( (x: { CustomerID: number; }) => {
             return x.CustomerID < 78;
         });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeTruthy();
         result.forEach( (x: { CustomerID: any; }) => {
             expect(x.CustomerID).toBeLessThan(78);
@@ -76,7 +74,7 @@ describe('ClosureParser.parseFilter()', () => {
     });
 
     it('should use between expression', async () => {
-        let a = new QueryExpression().select( (x: { CustomerID: any; CustomerName: any; ContactName: any; }) => {
+        const a = new QueryExpression().select( (x: { CustomerID: any; CustomerName: any; ContactName: any; }) => {
             x.CustomerID,
             x.CustomerName,
             x.ContactName
@@ -84,7 +82,7 @@ describe('ClosureParser.parseFilter()', () => {
         .from('Customers').where( (x: { CustomerID: number; }) => {
             return x.CustomerID > 78 && x.CustomerID < 81;
         });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeTruthy();
         result.forEach( (x: { CustomerID: any; }) => {
             expect(x.CustomerID).toBeGreaterThan(78);
@@ -93,7 +91,7 @@ describe('ClosureParser.parseFilter()', () => {
     });
 
     it('should use greater than or equal expression', async () => {
-        let a = new QueryExpression().select( (x: { CustomerID: any; CustomerName: any; ContactName: any; }) => {
+        const a = new QueryExpression().select( (x: { CustomerID: any; CustomerName: any; ContactName: any; }) => {
             x.CustomerID,
             x.CustomerName,
             x.ContactName
@@ -101,7 +99,7 @@ describe('ClosureParser.parseFilter()', () => {
         .from('Customers').where( (x: { CustomerID: number; }) => {
             return x.CustomerID >= 78;
         });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeTruthy();
         result.forEach( (x: { CustomerID: any; }) => {
             expect(x.CustomerID).toBeGreaterThanOrEqual(78);
@@ -109,7 +107,7 @@ describe('ClosureParser.parseFilter()', () => {
     });
 
     it('should use lower than or equal expression', async () => {
-        let a = new QueryExpression().select( (x: { CustomerID: any; CustomerName: any; ContactName: any; }) => {
+        const a = new QueryExpression().select( (x: { CustomerID: any; CustomerName: any; ContactName: any; }) => {
             x.CustomerID,
             x.CustomerName,
             x.ContactName
@@ -117,17 +115,17 @@ describe('ClosureParser.parseFilter()', () => {
         .from('Customers').where( (x: { CustomerID: number; }) => {
             return x.CustomerID <= 78;
         });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeTruthy();
         result.forEach( (x: { CustomerID: any; }) => {
             expect(x.CustomerID).toBeLessThanOrEqual(78);
         });
     });
 
-    
+
     it('should use parameters', async () => {
-        let maximumPrice = 30;
-        let a = new QueryExpression().select( (x: { ProductID: any; ProductName: any; Price: any; }) => {
+        const maximumPrice = 30;
+        const a = new QueryExpression().select( (x: { ProductID: any; ProductName: any; Price: any; }) => {
             x.ProductID,
             x.ProductName,
             x.Price
@@ -137,7 +135,7 @@ describe('ClosureParser.parseFilter()', () => {
         }, {
              maximumPrice
         });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeTruthy();
         result.forEach( (x: { Price: number; }) => {
             expect(x.Price / 1.25).toBeLessThan(30);
@@ -145,7 +143,7 @@ describe('ClosureParser.parseFilter()', () => {
     });
 
     it('should use Date.prototype.getFullYear()', async () => {
-        let a = new QueryExpression().select( (x: { OrderID: any; Customer: any; Employee: any; OrderDate: any; Shipper: any; }) => {
+        const a = new QueryExpression().select( (x: { OrderID: any; Customer: any; Employee: any; OrderDate: any; Shipper: any; }) => {
             x.OrderID,
             x.Customer,
             x.Employee,
@@ -155,7 +153,7 @@ describe('ClosureParser.parseFilter()', () => {
         .from('Orders').where( (x: { OrderDate: Date; }) => {
             return x.OrderDate.getFullYear() === 1996;
         });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeTruthy();
         result.forEach( (x: { OrderDate: Date; }) => {
             expect(x.OrderDate.getFullYear()).toBe(1996);
@@ -163,7 +161,7 @@ describe('ClosureParser.parseFilter()', () => {
     });
 
     it('should use Date.prototype.getMonth()', async () => {
-        let a = new QueryExpression().select( (x: { OrderID: any; Customer: any; Employee: any; OrderDate: any; Shipper: any; }) => {
+        const a = new QueryExpression().select( (x: { OrderID: any; Customer: any; Employee: any; OrderDate: any; Shipper: any; }) => {
             x.OrderID,
             x.Customer,
             x.Employee,
@@ -173,7 +171,7 @@ describe('ClosureParser.parseFilter()', () => {
         .from('Orders').where( (x: { OrderDate: Date; }) => {
             return x.OrderDate.getMonth() === 2;
         });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeTruthy();
         result.forEach( (x: { OrderDate: Date; }) => {
             expect(x.OrderDate.getMonth()).toBe(1);
@@ -181,7 +179,7 @@ describe('ClosureParser.parseFilter()', () => {
     });
 
     it('should use Date.prototype.getDate()', async () => {
-        let a = new QueryExpression().select( (x: { OrderID: any; Customer: any; Employee: any; OrderDate: any; Shipper: any; }) => {
+        const a = new QueryExpression().select( (x: { OrderID: any; Customer: any; Employee: any; OrderDate: any; Shipper: any; }) => {
             x.OrderID,
             x.Customer,
             x.Employee,
@@ -191,7 +189,7 @@ describe('ClosureParser.parseFilter()', () => {
         .from('Orders').where( (x: { OrderDate: Date; }) => {
             return x.OrderDate.getDate() === 22;
         });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeTruthy();
         result.forEach( (x: { OrderDate: Date; }) => {
             expect(x.OrderDate.getDate()).toBe(22);
@@ -199,7 +197,7 @@ describe('ClosureParser.parseFilter()', () => {
     });
 
     it('should use Date.prototype.getHours()', async () => {
-        let a = new QueryExpression().select( (x: { OrderID: any; Customer: any; Employee: any; OrderDate: any; Shipper: any; }) => {
+        const a = new QueryExpression().select( (x: { OrderID: any; Customer: any; Employee: any; OrderDate: any; Shipper: any; }) => {
             x.OrderID,
             x.Customer,
             x.Employee,
@@ -209,7 +207,7 @@ describe('ClosureParser.parseFilter()', () => {
         .from('Orders').where( (x: { OrderDate: { getHours: () => number; }; }) => {
             return x.OrderDate.getHours() === 14;
         });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeTruthy();
         result.forEach( (x: { OrderDate: Date; }) => {
             expect(x.OrderDate.getHours()).toBe(14);
@@ -217,7 +215,7 @@ describe('ClosureParser.parseFilter()', () => {
     });
 
     it('should use Date.prototype.getMinutes()', async () => {
-        let a = new QueryExpression().select( (x: { OrderID: any; Customer: any; Employee: any; OrderDate: any; Shipper: any; }) => {
+        const a = new QueryExpression().select( (x: { OrderID: any; Customer: any; Employee: any; OrderDate: any; Shipper: any; }) => {
             x.OrderID,
             x.Customer,
             x.Employee,
@@ -227,7 +225,7 @@ describe('ClosureParser.parseFilter()', () => {
         .from('Orders').where( (x: { OrderDate: Date; }) => {
             return x.OrderDate.getMinutes() === 50;
         });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeTruthy();
         result.forEach( (x: { OrderDate: Date; }) => {
             expect(x.OrderDate.getMinutes()).toBe(50);
@@ -235,7 +233,7 @@ describe('ClosureParser.parseFilter()', () => {
     });
 
     it('should use Date.prototype.getSeconds()', async () => {
-        let a = new QueryExpression().select( (x: { OrderID: any; Customer: any; Employee: any; OrderDate: any; Shipper: any; }) => {
+        const a = new QueryExpression().select( (x: { OrderID: any; Customer: any; Employee: any; OrderDate: any; Shipper: any; }) => {
             x.OrderID,
             x.Customer,
             x.Employee,
@@ -245,54 +243,54 @@ describe('ClosureParser.parseFilter()', () => {
         .from('Orders').where( (x: { OrderDate: Date; }) => {
             return x.OrderDate.getSeconds() > 0;
         });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeFalsy();
     });
 
     it('should use QueryExpression.orderBy()', async () => {
-        let a = new QueryExpression().select( (x: { ProductID: any; ProductName: any; Price: any; }) => {
+        const a = new QueryExpression().select( (x: { ProductID: any; ProductName: any; Price: any; }) => {
             x.ProductID,
             x.ProductName,
             x.Price
         })
         .from('Products').where( (x: { Price: number; }) => {
             return x.Price < 10;
-        }).orderBy( (x: { Price: any; }) => { 
+        }).orderBy( (x: { Price: any; }) => {
              x.Price
             });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeTruthy();
         result.forEach( (x: { Price: any; }, index: number) => {
             if (index>0) {
                 expect(x.Price).toBeGreaterThanOrEqual(result[index-1].Price);
             }
-            
+
         });
     });
 
     it('should use QueryExpression.orderByDescending()', async () => {
-        let a = new QueryExpression().select( (x: { ProductID: any; ProductName: any; Price: any; }) => {
+        const a = new QueryExpression().select( (x: { ProductID: any; ProductName: any; Price: any; }) => {
             x.ProductID,
             x.ProductName,
             x.Price
         })
         .from('Products').where( (x: { Price: number; }) => {
             return x.Price < 10;
-        }).orderByDescending( (x: { Price: any; }) => { 
+        }).orderByDescending( (x: { Price: any; }) => {
              x.Price
             });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeTruthy();
         result.forEach( (x: { Price: any; }, index: number) => {
             if (index>0) {
                 expect(x.Price).toBeLessThanOrEqual(result[index-1].Price);
             }
-            
+
         });
     });
 
     it('should use QueryExpression.join()', async () => {
-        let a = new QueryExpression().select( (x: { OrderID: any; OrderDate: any; Customer: any; }) => {
+        const a = new QueryExpression().select( (x: { OrderID: any; OrderDate: any; Customer: any; }) => {
             x.OrderID,
             x.OrderDate,
             x.Customer
@@ -303,8 +301,8 @@ describe('ClosureParser.parseFilter()', () => {
         .where( (x: { Customer: number; }) => {
             return x.Customer === 14;
         });
-        let result = await new MemoryAdapter().executeAsync(a);
+        const result = await new MemoryAdapter().executeAsync(a);
         expect(result.length).toBeTruthy();
     });
-    
+
 });

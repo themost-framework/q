@@ -67,7 +67,7 @@ describe('SqlFormatter', () => {
 
     it('should use SqlFormatter.$ne()', ()=> {
         const formatter = new SqlFormatter();
-        let sql = formatter.formatWhere({
+        const sql = formatter.formatWhere({
             "actionStatus": {  "$ne" : 1 }
         });
         expect(sql).toBe('NOT (`actionStatus` = 1)');
@@ -99,13 +99,13 @@ describe('SqlFormatter', () => {
         });
         const sqlToBe = 'SELECT * FROM `ActionData` WHERE (`actionStatus` = 1 AND `owner` = \'user1\')';
         expect(sql).toBe(sqlToBe);
-        let q = new QueryExpression().select().from('ActionData').where('actionStatus').equal(1).and('owner').equal('user1');
+        const q = new QueryExpression().select().from('ActionData').where('actionStatus').equal(1).and('owner').equal('user1');
         expect(formatter.formatSelect(q)).toBe(sqlToBe);
     });
 
     it('should use SqlFormatter.$or()', ()=> {
         const formatter = new SqlFormatter();
-        let sql = formatter.formatWhere({
+        const sql = formatter.formatWhere({
             "$or": [
                 { "owner": {  "$eq" : 'user1' } },
                 { "owner": {  "$eq" : 'user2' } }
@@ -116,7 +116,7 @@ describe('SqlFormatter', () => {
 
     it('should use SqlFormatter.formatField()', ()=> {
         const formatter = new SqlFormatter();
-        let query = {
+        const query = {
             $collection: {
                 'Users': '$UserData'
             },
@@ -125,7 +125,7 @@ describe('SqlFormatter', () => {
                 "name": 1
             }
         };
-        let sql = formatter.formatSelect(query);
+        const sql = formatter.formatSelect(query);
         expect(sql).toBe('SELECT `Users`.`id`, `Users`.`name` FROM `UserData` AS `Users`');
     });
 
@@ -150,7 +150,7 @@ describe('SqlFormatter', () => {
 
     it('should use SqlFormatter.$max()', ()=> {
         const formatter = new SqlFormatter();
-        let sql = formatter.formatField({
+        const sql = formatter.formatField({
             "maxPrice" : {
                  "$max": "$price"
             }
@@ -163,7 +163,7 @@ describe('SqlFormatter', () => {
 
     it('should use SqlFormatter.$avg()', ()=> {
         const formatter = new SqlFormatter();
-        let sql = formatter.formatField({
+        const sql = formatter.formatField({
             "avgPrice" : {
                  "$avg": "$price"
             }
@@ -173,7 +173,7 @@ describe('SqlFormatter', () => {
 
     it('should use SqlFormatter.$sum()', ()=> {
         const formatter = new SqlFormatter();
-        let sql = formatter.formatField({
+        const sql = formatter.formatField({
             "sumPrice" : {
                  "$sum": "$price"
             }
@@ -191,7 +191,7 @@ describe('SqlFormatter', () => {
 
     it('should use SqlFormatter.formatOrder()', ()=> {
         const formatter = new SqlFormatter();
-        let sql = formatter.formatOrder({
+        const sql = formatter.formatOrder({
             "$price": -1
         });
         expect(sql).toBe('`price` ASC');
@@ -226,7 +226,7 @@ describe('SqlFormatter', () => {
 
     it('should use SqlFormatter.formatGroupBy()', ()=> {
         const formatter = new SqlFormatter();
-        let sql = formatter.formatGroupBy({
+        const sql = formatter.formatGroupBy({
             "$count": "$CustomerID",
             "Country" : 1
         });

@@ -1,7 +1,7 @@
 // MOST Web Framework Codename ZeroGravity, copyright 2017-2020 THEMOST LP all rights reserved
 import {MethodCallExpression} from './expressions';
 import {parseScript} from 'esprima';
-import {floor} from 'mathjs';
+import {floor} from './math';
 import { PropertyIndexer } from './query';
 
 /**
@@ -28,8 +28,6 @@ class MathJsMethodParser {
             const callee = identifier.expressions[1];
             this.prefix.push(new RegExp(`^${callee.object.name}\\.(\\w+)`, 'g'));
         }
-        // add mathjs prefix
-        this.prefix.push(new RegExp(`^mathjs\\.(\\w+)`, 'g'));
     }
 
     test(name: string): any {

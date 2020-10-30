@@ -1,6 +1,4 @@
-import { ClosureParser } from '../src';
-// eslint-disable-next-line no-unused-vars
-import { round, ceil, floor, mod, multiply, subtract, divide, add, bitAnd } from 'mathjs';
+import { ClosureParser, round, ceil, floor, multiply, subtract, divide, add } from '../src';
 describe('ClosureParser', () => {
    it('should create instance', () => {
       const parser = new ClosureParser();
@@ -8,14 +6,14 @@ describe('ClosureParser', () => {
    });
     it('should use ClosureParser.parseSelect()', async () => {
         const parser = new ClosureParser();
-        let expr = parser.parseSelect((x: any) => x.dateCreated);
+        const expr = parser.parseSelect((x: any) => x.dateCreated);
         expect(expr).toBeTruthy();
         expect(expr instanceof Array).toBeTruthy();
         expect(expr[0]).toBe('$dateCreated');
     });
     it('should use ClosureParser.parseSelect()', async () => {
         const parser = new ClosureParser();
-        let expr = parser.parseSelect((x: any) => {
+        const expr = parser.parseSelect((x: any) => {
             x.id,
             x.dateCreated
         });
@@ -36,6 +34,7 @@ describe('ClosureParser', () => {
         expect(select[0].id).toBeTruthy();
         expect(select[1].createdAt).toBeTruthy();
 
+        // tslint:disable-next-line: only-arrow-functions
         select = parser.parseSelect(function(x: any) {
             return {
                 id: x.id,
@@ -47,7 +46,7 @@ describe('ClosureParser', () => {
 
     it('should use ClosureParser.parseSelect() with SequenceExpression', async () => {
         const parser = new ClosureParser();
-        let expr = parser.parseSelect((x: any) => {
+        const expr = parser.parseSelect((x: any) => {
             x.id,
             x.dateCreated.getMonth()
         });
@@ -139,9 +138,9 @@ describe('ClosureParser', () => {
     });
 
 
-    it('should use mathjs.round()', async () => {
+    it('should use round()', async () => {
         const parser = new ClosureParser();
-        let select = parser.parseSelect((x: any) => {
+        const select = parser.parseSelect((x: any) => {
             return {
                 "price": round(x.price, 4)
             }
@@ -153,9 +152,9 @@ describe('ClosureParser', () => {
         }]);
     });
 
-    it('should use mathjs.floor()', async () => {
+    it('should use floor()', async () => {
         const parser = new ClosureParser();
-        let select = parser.parseSelect((x: any) => {
+        const select = parser.parseSelect((x: any) => {
             return {
                 "price": floor(x.price * 0.8)
             }
@@ -163,19 +162,19 @@ describe('ClosureParser', () => {
         expect(select).toEqual(
         [{
             "price": {
-                "$floor": { 
-                    "$multiply": [ 
+                "$floor": {
+                    "$multiply": [
                         "$price",
-                        0.8 
-                    ] 
+                        0.8
+                    ]
                 }
             }
         }]);
     });
 
-    it('should use mathjs.add()', async () => {
+    it('should use add()', async () => {
         const parser = new ClosureParser();
-        let select = parser.parseSelect((x: any) => {
+        const select = parser.parseSelect((x: any) => {
             return {
                 "price": add(x.price, 4)
             }
@@ -189,7 +188,7 @@ describe('ClosureParser', () => {
 
     it('should use add javascript add operator', async () => {
         const parser = new ClosureParser();
-        let expr = parser.parseSelect((x: any) => {
+        const expr = parser.parseSelect((x: any) => {
             return {
                 "price": x.price + 4
             }
@@ -203,9 +202,9 @@ describe('ClosureParser', () => {
         ]);
     });
 
-    it('should use mathjs.subtract()', async () => {
+    it('should use subtract()', async () => {
         const parser = new ClosureParser();
-        let select = parser.parseSelect((x: any) => {
+        const select = parser.parseSelect((x: any) => {
             return {
                 "price": subtract(x.price, 4)
             }
@@ -219,7 +218,7 @@ describe('ClosureParser', () => {
 
     it('should use add javascript subtract operator', async () => {
         const parser = new ClosureParser();
-        let select = parser.parseSelect((x: any) => {
+        const select = parser.parseSelect((x: any) => {
             return {
                 "price": x.price - 4
             }
@@ -231,9 +230,9 @@ describe('ClosureParser', () => {
         }]);
     });
 
-    it('should use mathjs.multiply()', async () => {
+    it('should use multiply()', async () => {
         const parser = new ClosureParser();
-        let select = parser.parseSelect((x: any) => {
+        const select = parser.parseSelect((x: any) => {
             return {
                 "price": multiply(x.price, 0.9)
             }
@@ -247,7 +246,7 @@ describe('ClosureParser', () => {
 
     it('should use add javascript multiply operator', async () => {
         const parser = new ClosureParser();
-        let select = parser.parseSelect((x: any) => {
+        const select = parser.parseSelect((x: any) => {
             return {
                 "price": x.price * 0.8
             }
@@ -259,9 +258,9 @@ describe('ClosureParser', () => {
         }]);
     });
 
-    it('should use mathjs.divide()', async () => {
+    it('should use divide()', async () => {
         const parser = new ClosureParser();
-        let select = parser.parseSelect((x: any) => {
+        const select = parser.parseSelect((x: any) => {
             return {
                 "price": divide(x.price, 2)
             }
@@ -275,7 +274,7 @@ describe('ClosureParser', () => {
 
     it('should use add javascript divide operator', async () => {
         const parser = new ClosureParser();
-        let select = parser.parseSelect((x: any) => {
+        const select = parser.parseSelect((x: any) => {
             return {
                 "price": x.price / 2
             }
@@ -289,16 +288,16 @@ describe('ClosureParser', () => {
 
     it('should use add javascript divide and add operator', async () => {
         const parser = new ClosureParser();
-        let select = parser.parseSelect((x: any) => {
+        const select = parser.parseSelect((x: any) => {
             return {
                 "price": (x.price / 2) + 10
             }
         });
         expect(select).toEqual([{
             price: {
-                $add: [ 
-                    { $divide: [ "$price", 2 ] }, 
-                    10 
+                $add: [
+                    { $divide: [ "$price", 2 ] },
+                    10
                 ]
             }
         }]);
@@ -306,7 +305,7 @@ describe('ClosureParser', () => {
 
     it('should use String.prototype.substring()', async () => {
         const parser = new ClosureParser();
-        let select = parser.parseSelect((x: any) => {
+        const select = parser.parseSelect((x: any) => {
             return {
                 "name": x.name.substring(0,4)
             }
@@ -320,7 +319,7 @@ describe('ClosureParser', () => {
 
     it('should use String.prototype.toLowerCase()', async () => {
         const parser = new ClosureParser();
-        let select = parser.parseSelect((x: any) => {
+        const select = parser.parseSelect((x: any) => {
             return {
                 "status": x.status.toLowerCase()
             }
@@ -334,7 +333,7 @@ describe('ClosureParser', () => {
 
     it('should use String.prototype.toUpperCase()', async () => {
         const parser = new ClosureParser();
-        let select = parser.parseSelect((x: any) => {
+        const select = parser.parseSelect((x: any) => {
             return {
                 "status": x.status.toUpperCase()
             }
@@ -348,7 +347,7 @@ describe('ClosureParser', () => {
 
     it('should use Date.prototype.getFullYear()', async () => {
         const parser = new ClosureParser();
-        let expr = parser.parseSelect((x: any) => {
+        const expr = parser.parseSelect((x: any) => {
             return {
                 "yearCreated": x.dateCreated.getFullYear()
             }
@@ -362,7 +361,7 @@ describe('ClosureParser', () => {
 
     it('should use Date.prototype.getMonth()', async () => {
         const parser = new ClosureParser();
-        let expr = parser.parseSelect((x: any) => {
+        const expr = parser.parseSelect((x: any) => {
             return {
                 "monthCreated": x.dateCreated.getMonth()
             }
@@ -376,7 +375,7 @@ describe('ClosureParser', () => {
 
     it('should use Date.prototype.getDate()', async () => {
         const parser = new ClosureParser();
-        let expr = parser.parseSelect((x: any) => {
+        const expr = parser.parseSelect((x: any) => {
             return {
                 "dayCreated": x.dateCreated.getDate()
             }
@@ -390,7 +389,7 @@ describe('ClosureParser', () => {
 
     it('should use Date.prototype.getHours()', async () => {
         const parser = new ClosureParser();
-        let expr = parser.parseSelect((x: any) => {
+        const expr = parser.parseSelect((x: any) => {
             return {
                 "hourCreated": x.dateCreated.getHours()
             }
@@ -404,7 +403,7 @@ describe('ClosureParser', () => {
 
     it('should use Date.prototype.getMinutes()', async () => {
         const parser = new ClosureParser();
-        let expr = parser.parseSelect((x: any) => {
+        const expr = parser.parseSelect((x: any) => {
             return {
                 "minuteCreated": x.dateCreated.getMinutes()
             }
@@ -418,7 +417,7 @@ describe('ClosureParser', () => {
 
     it('should use Date.prototype.getSeconds()', async () => {
         const parser = new ClosureParser();
-        let expr = parser.parseSelect((x: any) => {
+        const expr = parser.parseSelect((x: any) => {
             return {
                 "secondCreated": x.dateCreated.getSeconds()
             }
