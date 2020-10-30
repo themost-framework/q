@@ -3,13 +3,13 @@ module.exports = (config) => {
   config.set({
     basePath: '',
     frameworks: [ 'jasmine', 'karma-typescript' ],
-    listenAddress: '0.0.0.0',
     port: '8080',
     plugins: [
       'karma-jasmine',
       'karma-chrome-launcher',
       'karma-typescript',
-      'karma-spec-reporter'
+      'karma-spec-reporter',
+      'karma-jasmine-html-reporter'
     ],
     karmaTypescriptConfig: {
       tsconfig: "tsconfig.spec.json",
@@ -35,7 +35,7 @@ module.exports = (config) => {
           'application/wasm': ['wasm'],
           'text/x-typescript': ['ts','tsx']
       },
-    reporters: [ 'spec' ],
+    reporters: [ 'kjhtml', 'spec' ],
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
