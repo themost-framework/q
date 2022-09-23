@@ -6,6 +6,8 @@ import { getOwnPropertyName, isMethodOrNameReference, PropertyIndexer } from './
 import { QueryCollection } from './QueryCollection';
 import { QueryExpression } from './QueryExpression';
 import { hasOwnProperty } from './has-own-property';
+import { ObjectNameValidator } from './ObjectNameValidator';
+import { instanceOf } from './instance-of';
 
 class ExpectedWhereExpression extends Error {
     /**
@@ -150,7 +152,8 @@ class SqlFormatter {
             finalName = name;
         }
         // return formatted name e.g User.name to `User`.`name`
-        return finalName.replace(/\$?(\w+)|^\$?(\w+)$/g, this.settings.nameFormat);
+        const validateName = finalName.replace(/\$?(\w+)|^\$?(\w+)$/g, '$1');
+        return ObjectNameValidator.validator.escape(validateName, this.settings.nameFormat);
     }
 
     /**
@@ -1042,6 +1045,70 @@ class SqlFormatter {
      */
     $bit(p0: any, p1: any): string {
          return `(${this.escape(p0)} & ${this.escape(p1)})`;
+    }
+
+    private isComparison(obj: any): boolean {
+        let key;
+        for(let prop in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, prop))
+                {
+                    key = prop;
+                    break;
+                }
+        }
+        if (key == null) {
+            return;
+        }
+        return (/^\$(eq|ne|lt|lte|gt|gte|in|nin|text|regex)$/g.test(key));
+    }
+
+    $cond(ifExpr: any, thenExpr: any, elseExpr: any) {
+        // validate ifExpr which should an instance of QueryExpression or a comparison expression
+        let ifExpression: string;
+        if (instanceOf(ifExpr, QueryExpression)) {
+            ifExpression = this.formatWhere(ifExpr.$where || ifExpr.$match);
+        } else if (this.isComparison(ifExpr)) {
+            ifExpression = this.formatWhere(ifExpr);
+        } else {
+            throw new Error('Condition parameter should be an instance of query or comparison expression');
+        }
+        return `(CASE ${ifExpression} WHEN 1 THEN ${this.escape(thenExpr)} ELSE ${this.escape(elseExpr)} END)`;
+    }
+
+    /**
+     * Formats a switch expression
+     * e.g. CASE WHEN weight>100 THEN 'Heavy' WHEN weight<20 THEN 'Light' ELSE 'Normal' END
+     * @param {{branches: Array<{ case: *, then: * }>, default: *}} expr
+     * @returns {string}
+     */
+     $switch(expr: any): string {
+        const branches = expr.branches;
+        const defaultValue = expr.default;
+        if (Array.isArray(branches) === false) {
+            throw new Error('Switch branches must be an array');
+        }
+        if (branches.length === 0) {
+            throw new Error('Switch branches cannot be empty');
+        }
+        let str = '(CASE';
+        str += ' ';
+        str += branches.map((branch: any) => {
+            let caseExpression;
+            if (instanceOf(branch.case, QueryExpression)) {
+                caseExpression = this.formatWhere(branch.case.$where);
+            } else if (this.isComparison(branch.case)) {
+                caseExpression = this.formatWhere(branch.case);
+            } else {
+                throw new Error('Case expression should be an instance of query or comparison expression');
+            }
+            return `WHEN ${caseExpression} THEN ${this.escape(branch.then)}`;
+        }).join(' ');
+        if (typeof defaultValue !== 'undefined') {
+            str += ' ELSE ';
+            str += this.escape(defaultValue);
+        }
+        str += ' END)';
+        return str;
     }
 
 }
