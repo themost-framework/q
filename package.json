@@ -1,6 +1,6 @@
 {
   "name": "@themost/q",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "MOST Web Framework Next Generation Query Module",
   "main": "dist/themost_q.umd.js",
   "module": "dist/themost_q.esm.js",
